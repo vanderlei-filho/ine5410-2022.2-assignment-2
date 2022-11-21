@@ -84,7 +84,7 @@ Observações:
 
 ### (BÔNUS: +1 PONTO NA P2) Paralelismo com processos
 
-- Será dado 1 ponto extra na p2 caso seja implementado o paralelismo para o processamento de transações, utilizando processos em Python!
+- Será dado 1 ponto extra na Prova 2 (P2) caso seja implementado o paralelismo para o processamento de transações com processos em Python!
 
 Bom trabalho!
 
