@@ -43,6 +43,7 @@ python3 main.py --help
 
 ### (5/10) Execução concorrente da geração e processamento de novas transações bancárias
 
+- No código esqueleto é inicializado 1 PaymentProcessor por banco, você deve modificar o código para que múltiplos PaymentProcessors processem transações bancárias de um mesmo banco de maneira concorrente.
 - Solucões baseadas em "supermutexes" serão descontadas. 
 - Erros de sincronização, condições de corrida e "starvation" serão descontados.
 
