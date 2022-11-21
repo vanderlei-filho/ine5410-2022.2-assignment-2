@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from logger import LOGGER
-from currency import Currency
+from utils.currency import Currency
+from utils.logger import LOGGER
 
 
 @dataclass
@@ -14,12 +14,16 @@ class Account:
 
     Atributos
     ---------
+    _id: int
+        Identificador da conta bancária.
+    _bank_id: int
+        Identificador do banco no qual a conta bancária foi criada.
+    currency : Currency
+        Moeda corrente da conta bancária.
     balance : int
         Saldo da conta bancária.
     overdraft_limit : int
         Limite de cheque especial da conta bancária.
-    currency : Currency
-        Moeda corrente da conta bancária.
 
     Métodos
     -------
@@ -39,10 +43,10 @@ class Account:
 
     def info(self) -> None:
         """
-        Esse método serve para printar informações sobre a conta bancária.
-        Não é necessário modificá-lo.
+        Esse método printa informações gerais sobre a conta bancária.
         """
-        # TODO: IMPLEMENTE AS MODIFICAÇÕES NECESSÁRIAS NESTE MÉTODO !
+        # TODO: IMPLEMENTE AS MODIFICAÇÕES, SE NECESSÁRIAS, NESTE MÉTODO!
+
         pretty_balance = f"{format(round(self.balance/100), ',d')}.{self.balance%100:02d} {self.currency.name}"
         pretty_overdraft_limit = f"{format(round(self.overdraft_limit/100), ',d')}.{self.overdraft_limit%100:02d} {self.currency.name}"
         LOGGER.info(f"Account::{{ _id={self._id}, _bank_id={self._bank_id}, balance={pretty_balance}, overdraft_limit={pretty_overdraft_limit} }}")
@@ -50,9 +54,9 @@ class Account:
 
     def deposit(self, amount: int) -> bool:
         """
-        Esse método deverá adicionar o valor `amount` especificado ao saldo da conta bancária (`balance`).
-        Lembre-se que esse método pode ser chamado concorrentemente por múltiplos PaymentProcessors, 
-        então modifique-o para garantir que não ocorram erros de concorrência!
+        Esse método deverá adicionar o valor `amount` passado como argumento ao saldo da conta bancária 
+        (`balance`). Lembre-se que esse método pode ser chamado concorrentemente por múltiplos 
+        PaymentProcessors, então modifique-o para garantir que não ocorram erros de concorrência!
         """
         # TODO: IMPLEMENTE AS MODIFICAÇÕES NECESSÁRIAS NESTE MÉTODO !
 

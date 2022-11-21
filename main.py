@@ -1,26 +1,13 @@
-import logging
-from threading import Semaphore, Lock, Condition
-from time import sleep
+import argparse, time, sys
+from logging import INFO, DEBUG
 from random import randint
-import sys, argparse
 
-from account import Account
-from bank import Bank
-from currency import Currency
-from logger import CH, LOGGER
-
-
-# Printar logs para debugging?
-debug = False
-
-# Bancos Nacionais.
-banks = []
-
-# Tempo total de simulação.
-total_time = 1000
-
-# Uma unidade de tempo de simulação. Quanto menor, mais rápida a execução.
-time_unit= 0.1  # 0.1 = 100ms
+from globals import *
+from payment_system.bank import Bank
+from payment_system.payment_processor import PaymentProcessor
+from payment_system.transaction_generator import TransactionGenerator
+from utils.currency import Currency
+from utils.logger import CH, LOGGER
 
 
 if __name__ == "__main__":
@@ -44,36 +31,39 @@ if __name__ == "__main__":
 
     # Configura logger
     if debug:
-        LOGGER.setLevel(logging.DEBUG)
-        CH.setLevel(logging.DEBUG)
+        LOGGER.setLevel(DEBUG)
+        CH.setLevel(DEBUG)
     else:
-        LOGGER.setLevel(logging.INFO)
-        CH.setLevel(logging.INFO)
+        LOGGER.setLevel(INFO)
+        CH.setLevel(INFO)
+
+    # Printa argumentos capturados da simulação
+    LOGGER.info(f"Iniciando simulação com os seguintes parâmetros:\n\ttotal_time = {total_time}\n\tdebug = {debug}\n")
+    time.sleep(3)
 
     # Inicializa variável `tempo`:
     t = 0
     
-    # Inicializa bancos nacionais:
-    LOGGER.info("Inicializando bancos nacionais...")
+    # Cria os Bancos Nacionais e popula a lista global `banks`:
     for i, currency in enumerate(Currency):
         bank = Bank(_id=i, currency=currency)
         banks.append(bank)
-        LOGGER.info(f"Banco Nacional {bank._id} de moeda corrente {bank.currency.name} inicializado!")
 
-    # Inicializa clientes e executa o loop de simulação:
-    LOGGER.info("Inicializando simulação!!!")
-
+    # Inicializa gerador de transações e processadores de pagamentos para os Bancos Nacionais:
+    for i, bank in enumerate(banks):
+        TransactionGenerator(_id=i, bank=bank).start()
+        PaymentProcessor(_id=i, bank=bank).start()
+        
     # Enquanto o tempo total de simuação não for atingido:
     while t < total_time:
-        #
-
-
         # Aguarda um tempo aleatório antes de criar o próximo cliente:
         dt = randint(0, 3)
-        sleep(dt * time_unit)
+        time.sleep(dt * time_unit)
 
         # Atualiza a variável tempo considerando o intervalo de criação dos clientes:
         t += dt
 
-    # Finaliza bancos:
-    # TODO adicione o código para finalização dos bancos nacionais aqui!
+    # Finaliza todas as threads
+
+    # Termina simulação. Após esse print somente dados devem ser printados no console.
+    LOGGER.info(f"A simulação chegou ao fim!\n")

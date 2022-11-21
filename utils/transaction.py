@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional
+from typing import Optional, Tuple
 
-from logger import LOGGER  
-from currency import Currency
+from utils.currency import Currency
+from utils.logger import LOGGER
 
 
 class TransactionStatus(Enum):
@@ -27,20 +27,22 @@ class Transaction:
 
     Atributos
     ---------
-    origin : (int, int)
-        uma tupla contendo o identificador do banco e da conta de origem.
-    destination : (int, int)
-        uma tupla contendo o identificador do banco e da conta destino.
+    _id : int
+        Um identificador da transação bancária.
+    origin : Tuple[int, int]
+        Uma tupla contendo o identificador do banco e da conta de origem.
+    destination : Tuple[int, int]
+        Uma tupla contendo o identificador do banco e da conta destino.
     amount : int
-        valor a ser transferido
+        Valor a ser transferido.
     currency : Currency
-        moeda a ser transferida
+        Moeda a ser transferida.
     status : TransactionStatus
-        status da transação bancária
+        Status da transação bancária.
     created_at : datetime
-        timestamp do momento de criação da transação bancária (quando ela é requisitada pelo cliente)
+        Timestamp do momento de criação da transação bancária (quando ela é requisitada pelo cliente).
     completed_at : datetime
-        timestamp do momento em que a transação é finalizada (seja status FAILED ou SUCCESSFUL)
+        Timestamp do momento em que a transação é finalizada (seja status FAILED ou SUCCESSFUL).
 
     Métodos
     -------
@@ -48,8 +50,9 @@ class Transaction:
         Define um novo status para a transação bancária.
     """
 
-    origin: (int, int)
-    destination: (int, int) 
+    _id: int
+    origin: Tuple[int, int]
+    destination: Tuple[int, int] 
     amount: int
     currency: Currency
     exchange_fee: int = 0
@@ -65,7 +68,7 @@ class Transaction:
         ATENÇÃO: NÃO É PERMITIDO ALTERAR ESSE MÉTODO!
         """
         self.status = status
-        self.completed_at = dt.now()
+        self.completed_at = datetime.now()
 
 
     def get_processing_time(self) -> Optional[timedelta]:
@@ -74,7 +77,7 @@ class Transaction:
         Essa função deve retornar None caso a transação ainda não tenha finalizado.
         ATENÇÃO: NÃO É PERMITIDO ALTERAR ESSE MÉTODO!
         """
-        if self.status != TransactionStatus.PENDING:
+        if self.completed_at != None:
             return self.completed_at - self.created_at
         else:
             LOGGER.warn(f"Attempt to get processing time of pending transaction!")
