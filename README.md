@@ -46,6 +46,8 @@ O código base aceita alguns argumentos que modificam a velocidade de execução
 python3 main.py --help
 ```
 
+OBS: caso você execute o código esqueleto sem modificar nada, notará que vários logs de erro do tipo `[ERROR] Falha em PaymentProcessor.run(): pop from empty list` aparecerão no console. Isso é esperado, já que faltam modificações necessárias para o funcionamento correto da simulação.
+
 ## Critérios de Avaliação
 
 Observações:
