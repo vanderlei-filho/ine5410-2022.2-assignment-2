@@ -14,7 +14,6 @@ Um *Banco Nacional* é um banco que gerencia contas de clientes. Existem seis Ba
 2. Possui uma lista de contas bancárias de clientes que armazenam dinheiro na moeda corrente.
 3. Possui seis *contas especiais internas* (classe `CurrencyReserves`), uma para cada moeda.
 4. Possui uma fila de transações a serem processadas denominada `transaction_queue`.
-5. Possui um processador de transações bancárias associado a ele (classe `PaymentProcessor`).
 
 ### Contas Bancárias
 
@@ -49,11 +48,16 @@ python3 main.py --help
 
 ## Critérios de Avaliação
 
+Observações:
+- É obrigatório o uso do código esqueleto fornecido.
+- Todos prints adicionados no código devem ser realizados por meio do LOGGER disponível no submódulo `utils` (existem vários exemplos pelo código esqueleto).
+
 ### (5/10) Execução concorrente da geração e processamento de novas transações bancárias
 
 - No código esqueleto é inicializado 1 PaymentProcessor por banco, você deve modificar o código para que múltiplos PaymentProcessors processem transações bancárias de um mesmo banco de maneira concorrente.
 - Solucões baseadas em "supermutexes" serão descontadas. 
-- Erros de sincronização, condições de corrida e "starvation" serão descontados.
+- Erros de sincronização, condições de corrida serão descontados.
+- As `transaction_queues` não são dadas como filas FIFO no código esqueleto. Reflita se isso pode acarretar em algum problema para um sistema de pagamentos instantâneo, e realize as devidas alterações para mitigar eventuais problemas.
 
 ### (2/10) Funcionamento correto do método `Bank.info()`:
 
@@ -66,10 +70,21 @@ python3 main.py --help
 
 ### (2/10) Finalização das threads e da simulação
 
-- Ao final da simulação (quando o tempo final ser alcançado), todas as threads devem ser corretamente finalizadas e nenhuma thread pode modificar variáveis globais após o término da simulação
+- Nenhuma transação pode ser executada após o término da simulação
+- Ao final da simulação (quando o tempo final ser alcançado), deve ser printado (com o LOGGER fornecido) a quantidade total (de todos os bancos) de transacões que NÃO foram processadas, e a média de tempo em que elas ficaram nas filas de espera.
+- Ao final da simulação, todas as threads devem ser corretamente finalizadas e nenhuma thread pode modificar variáveis globais após o término da simulação
 
 ### (1/10) Regras de cálculo das taxas bancárias e operações de câmbio
 
 - O câmbio deverá ser calculado utilizando a função `get_exchange_rate` do módulo `currency.py`
 - O banco deverá cobrar uma taxa de 5% sobre o valor utilizado do cheque especial em uma transação
 - O banco deverá cobrar uma taxa de 1% sobre o valor total de toda transação internacional (operação de câmbio)
+
+### (BÔNUS: +1 PONTO NA P2) Paralelismo com processos
+
+- Será dado 1 ponto extra na p2 caso seja implementado o paralelismo para o processamento de transações, utilizando processos em Python!
+
+Bom trabalho!
+
+Em caso de dúvidas, marcar atendimento com o estagiário de docência:
+ - Vanderlei Munhoz `munhoz@proton.me`
