@@ -44,17 +44,20 @@ class TransactionGenerator(Thread):
 
         LOGGER.info(f"Inicializado TransactionGenerator para o Banco Nacional {self.bank._id}!")
 
-        operating = banks[self.bank._id].operating
-
         i = 0
-        while operating:
+        while banks[self.bank._id].operating:
             origin = (self.bank._id, self._id)
             destination_bank = randint(0, 5)
             destination = (destination_bank, randint(0, 100))
             amount = randint(100, 1000000)
             new_transaction = Transaction(i, origin, destination, amount, currency=Currency(destination_bank+1))
             banks[self.bank._id].transaction_queue.append(new_transaction)
-            i=+1
+            
+            # da push no semáforo correspondente ao banco
+            sems[destination_bank].release()
+            
+            
+            i+=1
             time.sleep(0.2 * time_unit)
 
         LOGGER.info(f"O TransactionGenerator {self._id} do banco {self.bank._id} foi finalizado.")
