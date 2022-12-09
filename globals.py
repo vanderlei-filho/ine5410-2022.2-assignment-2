@@ -20,6 +20,3 @@ time_unit = 0.1  # 0.1 = 100ms
 bank_sems = []
 for i in range(6):
     bank_sems.append(Semaphore(0))
-
-# Semáforo que cuida da sincronização no acesso às contas bancárias
-acc_sem = Semaphore(0)

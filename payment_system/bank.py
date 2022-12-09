@@ -65,20 +65,19 @@ class Bank():
         # Adiciona a Account criada na lista de contas do banco
         # @arthur: imagino que por "mudança necessária" aqui eles estejam se referindo à sincronzição de acesso à contas
         # TODO: 1. checar se append pode causar condição de corrida (acho difícil né mas caso usemos Process acho que teria)
-        #       2. acho que teria que ter um semáforo aqui para sincronizar o acesso às contas - se append conta, release no mutex
+        #       2. (esquece, é só write e never read) acho que teria que ter um semáforo aqui para sincronizar o acesso às contas - se append conta, release no mutex
         #                                                                                        se pop conta, acquire no mutex
 
         # with self.lock:
         self.accounts.append(acc)
-        acc_sem.release()
 
 
     def info(self) -> None:
         """
         Essa função deverá printar os seguintes dados utilizando o LOGGER fornecido:
-        1. Saldo de cada moeda nas reservas internas do banco
+        1. done --- Saldo de cada moeda nas reservas internas do banco
         2. Número de transferências nacionais e internacionais realizadas
-        3. Número de contas bancárias registradas no banco
+        3. done --- Número de contas bancárias registradas no banco
         4. Saldo total de todas as contas bancárias (dos clientes) registradas no banco
         5. Lucro do banco: taxas de câmbio acumuladas + juros de cheque especial acumulados
         """
@@ -93,5 +92,8 @@ class Bank():
         LOGGER.info(f"CHF: {self.reserves.CHF.balance}")
         LOGGER.info(f"GBṔ: {self.reserves.GBP.balance}")
         LOGGER.info("--- Número de transferências nacionais e internacionis realizadas ---")
-        
+        # TODO: COMPLETAR ISSO
+
+        LOGGER.info("--- Número de contas bancárias registradas no banco ---")
+        LOGGER.info(len(self.accounts))
         LOGGER.info(f"...")

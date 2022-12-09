@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from utils.currency import Currency
 from utils.logger import LOGGER
-
+from threading import Lock
 
 @dataclass
 class Account:
@@ -24,6 +24,8 @@ class Account:
         Saldo da conta bancária.
     overdraft_limit : int
         Limite de cheque especial da conta bancária.
+    _lock:
+        Mutex específico da conta para garantir que não existirão erros de concorrência no read & write do self.balance
 
     Métodos
     -------
@@ -40,6 +42,7 @@ class Account:
     currency: Currency
     balance: int = 0
     overdraft_limit: int = 0
+    _lock = Lock()
 
     def info(self) -> None:
         """
@@ -60,7 +63,8 @@ class Account:
         """
         # TODO: IMPLEMENTE AS MODIFICAÇÕES NECESSÁRIAS NESTE MÉTODO !
 
-        self.balance += amount
+        with self._lock:
+            self.balance += amount
         LOGGER.info(f"deposit({amount}) successful!")
         return True
 
@@ -74,19 +78,20 @@ class Account:
         """
         # TODO: IMPLEMENTE AS MODIFICAÇÕES NECESSÁRIAS NESTE MÉTODO !
 
-        if self.balance >= amount:
-            self.balance -= amount
-            LOGGER.info(f"withdraw({amount}) successful!")
-            return True
-        else:
-            overdrafted_amount = abs(self.balance - amount)
-            if self.overdraft_limit >= overdrafted_amount:
+        # mutex da conta garante o acesso sem erros de concorrência
+        with self._lock:
+            if self.balance >= amount:
                 self.balance -= amount
-                LOGGER.info(f"withdraw({amount}) successful with overdraft!")
+                LOGGER.info(f"withdraw({amount}) successful!")
                 return True
             else:
-                LOGGER.warning(f"withdraw({amount}) failed, no balance!")
-                return False
+                overdrafted_amount = abs(self.balance - amount)
+                if self.overdraft_limit >= overdrafted_amount:
+                    self.balance -= amount
+                    LOGGER.info(f"withdraw({amount}) successful with overdraft!")
+                    return True
+        LOGGER.warning(f"withdraw({amount}) failed, no balance!")
+        return False
 
 
 @dataclass
