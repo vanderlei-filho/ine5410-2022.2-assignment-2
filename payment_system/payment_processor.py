@@ -46,16 +46,12 @@ class PaymentProcessor(Thread):
         LOGGER.info(f"Inicializado o PaymentProcessor {self._id} do Banco {self.bank._id}!")
         queue = banks[self.bank._id].transaction_queue
 
-        while True:
-            try:
-                transaction = queue.pop()
-                LOGGER.info(f"Transaction_queue do Banco {self.bank._id}: {queue}")
-            except Exception as err:
-                LOGGER.error(f"Falha em PaymentProcessor.run(): {err}")
-            else:
-                self.process_transaction(transaction)
-            time.sleep(3 * time_unit)  # Remova esse sleep após implementar sua solução!
-
+        # adquire um semáforo reference ao banco em questão e não permite a propagação de erros no método pop
+        # aqui nem precisa de um try ... except devido ao semáforo
+        bank_sems[self.bank.currency-1].acquire()
+        transaction = queue.pop()
+        LOGGER.info(f"Transaction_queue do Banco {self.bank._id}: {queue}")
+        self.process_transaction(transaction)
         LOGGER.info(f"O PaymentProcessor {self._id} do banco {self._bank_id} foi finalizado.")
 
 

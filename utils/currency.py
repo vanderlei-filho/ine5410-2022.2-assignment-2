@@ -1,9 +1,9 @@
-from enum import Enum
+from enum import IntEnum
 
 from globals import *
 
 
-class Currency(Enum):
+class Currency(IntEnum):
     """
     Uma Enum para os diferentes tipos de moedas correntes disponíveis.
     OBS: NÃO É PERMITIDO ALTERAR AS VARIANTES DESSA ENUM!
