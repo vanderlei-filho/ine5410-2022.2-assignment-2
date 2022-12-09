@@ -1,5 +1,6 @@
 from typing import Tuple
 
+from globals import *
 from payment_system.account import Account, CurrencyReserves
 from utils.transaction import Transaction
 from utils.currency import Currency
@@ -62,7 +63,14 @@ class Bank():
         acc = Account(_id=acc_id, _bank_id=self._id, currency=self.currency, balance=balance, overdraft_limit=overdraft_limit)
   
         # Adiciona a Account criada na lista de contas do banco
+        # @arthur: imagino que por "mudança necessária" aqui eles estejam se referindo à sincronzição de acesso à contas
+        # TODO: 1. checar se append pode causar condição de corrida (acho difícil né mas caso usemos Process acho que teria)
+        #       2. acho que teria que ter um semáforo aqui para sincronizar o acesso às contas - se append conta, release no mutex
+        #                                                                                        se pop conta, acquire no mutex
+
+        # with self.lock:
         self.accounts.append(acc)
+        acc_sem.release()
 
 
     def info(self) -> None:
@@ -77,4 +85,13 @@ class Bank():
         # TODO: IMPLEMENTE AS MODIFICAÇÕES, SE NECESSÁRIAS, NESTE MÉTODO!
 
         LOGGER.info(f"Estatísticas do Banco Nacional {self._id}:")
+        LOGGER.info("--- Saldo de cada moeda nas reservas internas ---")
+        LOGGER.info(f"BRL: {self.reserves.BRL.balance}")
+        LOGGER.info(f"USD: {self.reserves.USD.balance}")
+        LOGGER.info(f"EUR: {self.reserves.EUR.balance}")
+        LOGGER.info(f"JPY: {self.reserves.JPY.balance}")
+        LOGGER.info(f"CHF: {self.reserves.CHF.balance}")
+        LOGGER.info(f"GBṔ: {self.reserves.GBP.balance}")
+        LOGGER.info("--- Número de transferências nacionais e internacionis realizadas ---")
+        
         LOGGER.info(f"...")
