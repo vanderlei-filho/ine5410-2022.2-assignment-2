@@ -57,8 +57,8 @@ class TransactionGenerator(Thread):
                 banks[self.bank._id].transaction_queue.append(new_transaction)
             
             # da push no semáforo correspondente ao banco
-            self.bank.queue_sem.acquire()
-            
+            self.bank.q_sem.release()
+
             i+=1
             time.sleep(0.2 * time_unit)
 

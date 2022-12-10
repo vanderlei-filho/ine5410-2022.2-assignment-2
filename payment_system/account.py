@@ -24,7 +24,7 @@ class Account:
         Saldo da conta bancária.
     overdraft_limit : int
         Limite de cheque especial da conta bancária.
-    _lock:
+    _mutex:
         Mutex específico da conta para garantir que não existirão erros de concorrência no read & write do self.balance
 
     Métodos
@@ -63,7 +63,7 @@ class Account:
         """
         # TODO: IMPLEMENTE AS MODIFICAÇÕES NECESSÁRIAS NESTE MÉTODO !
 
-        with self._lock:
+        with self._mutex:
             self.balance += amount
         LOGGER.info(f"deposit({amount}) successful!")
         return True

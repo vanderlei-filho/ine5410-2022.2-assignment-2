@@ -48,7 +48,7 @@ class Bank():
         self._id                = _id
         self.currency           = currency
         self.reserves           = CurrencyReserves()
-        self.operating          = False
+        self.operating          = True
         self.accounts           = []
         self.transaction_queue  = []
         self.q_sem              = Semaphore(0)

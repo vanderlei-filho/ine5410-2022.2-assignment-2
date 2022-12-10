@@ -3,6 +3,7 @@ from threading import Thread
 
 from globals import *
 from payment_system.bank import Bank
+from utils.currency import *
 from utils.transaction import Transaction, TransactionStatus
 from utils.logger import LOGGER
 
@@ -35,7 +36,7 @@ class PaymentProcessor(Thread):
         self.bank = bank
 
 
-    def run(self):
+    def run(self) -> None:
         """
         Esse método deve buscar Transactions na fila de transações do banco e processá-las 
         utilizando o método self.process_transaction(self, transaction: Transaction).
@@ -44,21 +45,22 @@ class PaymentProcessor(Thread):
         # TODO: IMPLEMENTE/MODIFIQUE O CÓDIGO NECESSÁRIO ABAIXO !
 
         LOGGER.info(f"Inicializado o PaymentProcessor {self._id} do Banco {self.bank._id}!")
-        queue = banks[self.bank._id].transaction_queue
+        queue: list = banks[self.bank._id].transaction_queue
+        LOGGER.info(f"depois do queue = bank[self.bank._id].transaction_queue")
 
         # adquire um semáforo reference ao banco questão e não permite a propagação de erros no método pop
         # aqui nem precisa de um try ... except devido ao semáforo
         # TODO: consertar bug aqui. o valor do sem no index self.bank.currency-1 é igual a 0. 
         while self.bank.operating:
-            LOGGER.info(self.bank.operating)
-            self.bank.queue_sem.acquire()
+            LOGGER.info("yabadabadoo 🦧🦧🦧🦧🦧")
+            self.bank.q_sem.acquire()
+            LOGGER.info("🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠🤠")
             
             with self.bank.q_mutex:   
                 transaction = queue.pop()
             
-            LOGGER.info(f"Transaction_queue do Banco {self.bank._id}: {queue}")
             self.process_transaction(transaction)
-            LOGGER.info(f"O PaymentProcessor {self._id} do banco {self._bank_id} foi finalizado.")
+            LOGGER.info(f"O PaymentProcessor {self._id} do banco {self.bank._id} foi finalizado.")
 
 
     def process_transaction(self, transaction: Transaction) -> TransactionStatus:
@@ -73,6 +75,20 @@ class PaymentProcessor(Thread):
 
         LOGGER.info(f"PaymentProcessor {self._id} do Banco {self.bank._id} iniciando processamento da Transaction {transaction._id}!")
         
+        # Pegando a conta origem
+        origin = transaction.origin
+
+        # Pegando a taxa de conversão
+        rate = get_exchange_rate()
+
+        # Realizando withdraw da conta origem para tirar o dinheiro 
+        if origin.withdraw(transaction.amount):
+            dest = transaction.destination
+            if transaction.currency == Currency.EUR:
+                
+
+
+
         # NÃO REMOVA ESSE SLEEP!
         # Ele simula uma latência de processamento para a transação.
         time.sleep(3 * time_unit)
