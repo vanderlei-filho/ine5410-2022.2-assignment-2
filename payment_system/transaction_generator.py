@@ -51,11 +51,13 @@ class TransactionGenerator(Thread):
             destination = (destination_bank, randint(0, 100))
             amount = randint(100, 1000000)
             new_transaction = Transaction(i, origin, destination, amount, currency=Currency(destination_bank+1))
-            banks[self.bank._id].transaction_queue.append(new_transaction)
+            
+            # garente o acesso atômico
+            with self.bank.q_mutex:
+                banks[self.bank._id].transaction_queue.append(new_transaction)
             
             # da push no semáforo correspondente ao banco
-            bank_sems[destination_bank].release()
-            
+            self.bank.queue_sem.acquire()
             
             i+=1
             time.sleep(0.2 * time_unit)

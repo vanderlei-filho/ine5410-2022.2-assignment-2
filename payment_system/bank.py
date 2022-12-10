@@ -1,11 +1,11 @@
 from typing import Tuple
+from threading import Lock
 
 from globals import *
 from payment_system.account import Account, CurrencyReserves
 from utils.transaction import Transaction
 from utils.currency import Currency
 from utils.logger import LOGGER
-
 
 class Bank():
     """
@@ -28,6 +28,10 @@ class Bank():
         Lista contendo as contas bancárias dos clientes do banco.
     transaction_queue : Queue[Transaction]
         Fila FIFO contendo as transações bancárias pendentes que ainda serão processadas.
+    q_sem: Semaphore
+        Semáforo utilizado para sincronizar o acesso às transações, garantindo o uso correto.
+    q_lock: Lock
+        Mutex para garantir acesso atômico à queue de transações.
 
     Métodos
     -------
@@ -47,6 +51,8 @@ class Bank():
         self.operating          = False
         self.accounts           = []
         self.transaction_queue  = []
+        self.q_sem              = Semaphore(0)
+        self.q_mutex            = Lock()
 
 
     def new_account(self, balance: int = 0, overdraft_limit: int = 0) -> None:

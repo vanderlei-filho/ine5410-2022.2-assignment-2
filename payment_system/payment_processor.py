@@ -46,13 +46,19 @@ class PaymentProcessor(Thread):
         LOGGER.info(f"Inicializado o PaymentProcessor {self._id} do Banco {self.bank._id}!")
         queue = banks[self.bank._id].transaction_queue
 
-        # adquire um semáforo reference ao banco em questão e não permite a propagação de erros no método pop
+        # adquire um semáforo reference ao banco questão e não permite a propagação de erros no método pop
         # aqui nem precisa de um try ... except devido ao semáforo
-        bank_sems[self.bank.currency-1].acquire()
-        transaction = queue.pop()
-        LOGGER.info(f"Transaction_queue do Banco {self.bank._id}: {queue}")
-        self.process_transaction(transaction)
-        LOGGER.info(f"O PaymentProcessor {self._id} do banco {self._bank_id} foi finalizado.")
+        # TODO: consertar bug aqui. o valor do sem no index self.bank.currency-1 é igual a 0. 
+        while self.bank.operating:
+            LOGGER.info(self.bank.operating)
+            self.bank.queue_sem.acquire()
+            
+            with self.bank.q_mutex:   
+                transaction = queue.pop()
+            
+            LOGGER.info(f"Transaction_queue do Banco {self.bank._id}: {queue}")
+            self.process_transaction(transaction)
+            LOGGER.info(f"O PaymentProcessor {self._id} do banco {self._bank_id} foi finalizado.")
 
 
     def process_transaction(self, transaction: Transaction) -> TransactionStatus:
