@@ -75,19 +75,43 @@ class PaymentProcessor(Thread):
 
         LOGGER.info(f"PaymentProcessor {self._id} do Banco {self.bank._id} iniciando processamento da Transaction {transaction._id}!")
         
-        # Pegando a conta origem
-        origin = transaction.origin
+        # Pegando a conta origem e de destino
+        og = transaction.origin[0]
+        dest = transaction.destination[0]
+        og_acc = transaction.origin[1]
+        dest_acc = transaction.destination[1]
 
         # Pegando a taxa de conversão
-        rate = get_exchange_rate()
+        rate = get_exchange_rate(self.bank.currency, transaction.currency)
 
         # Realizando withdraw da conta origem para tirar o dinheiro 
-        if origin.withdraw(transaction.amount):
-            dest = transaction.destination
-            if transaction.currency == Currency.EUR:
-                
-
-
+        if banks[og].accounts[og_acc].withdraw(transaction.amount):
+            transferred = transaction.amount * rate
+            match transaction.currency:
+                case Currency.EUR:
+                    self.bank.reserves.EUR.deposit(transferred)
+                    self.bank.reserves.EUR.withdraw(transferred)
+                    self.bank.reserves.EUR.deposit(dest.accounts[dest_acc])
+                case Currency.USD:
+                    self.bank.reserves.USD.deposit(transferred)
+                    self.bank.reserves.USD.withdraw(transferred)               
+                    self.bank.reserves.USD.deposit(dest.accounts[dest_acc])
+                case Currency.CHF:
+                    self.bank.reserves.CHF.deposit(transferred)
+                    self.bank.reserves.CHF.withdraw(transferred)
+                    self.bank.reserves.CHF.deposit(dest.accounts[dest_acc])
+                case Currency.JPY:
+                    self.bank.reserves.JPY.deposit(transferred)
+                    self.bank.reserves.JPY.withdraw(transferred)
+                    self.bank.reserves.JPY.deposit(dest.accounts[dest_acc])
+                case Currency.GBP:
+                    self.bank.reserves.GBP.deposit(transferred)
+                    self.bank.reserves.GBP.withdraw(transferred)
+                    self.bank.reserves.GBP.deposit(dest.accounts[dest_acc])                
+                case _:
+                    self.bank.reserves.BRL.deposit(transferred)
+                    self.bank.reserves.BRL.withdraw(transferred)
+                    self.bank.reserves.BRL.deposit(dest.accounts[dest_acc])
 
         # NÃO REMOVA ESSE SLEEP!
         # Ele simula uma latência de processamento para a transação.

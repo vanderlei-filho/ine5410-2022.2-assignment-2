@@ -42,7 +42,7 @@ class Account:
     currency: Currency
     balance: int = 0
     overdraft_limit: int = 0
-    _lock = Lock()
+    _mutex = Lock()
 
     def info(self) -> None:
         """
